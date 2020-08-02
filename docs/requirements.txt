@@ -1,3 +1,4 @@
 sphinx>=3,<4
 numpydoc>=1,<2
+recommonmark
 jsonschema>=3,<4

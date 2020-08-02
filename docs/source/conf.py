@@ -15,6 +15,8 @@ import os
 import sys
 sys.path.insert(0, os.path.abspath('../../'))
 
+from recommonmark.transform import AutoStructify
+
 
 # -- Project information -----------------------------------------------------
 
@@ -22,6 +24,8 @@ project = 'cascade-config'
 copyright = '2020, RalfG'
 author = 'RalfG'
 github_project_url = "https://github.com/ralfg/cascade-config/"
+github_doc_root = 'https://github.com/ralfg/cascade-config/tree/master/docs/'
+
 
 def get_version(path):
     with open(path, "rt") as f:
@@ -41,8 +45,14 @@ extensions = [
     "sphinx.ext.autodoc",
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
-    "sphinx_rtd_theme"
+    "sphinx_rtd_theme",
+    "recommonmark",
 ]
+source_parsers = {
+    '.md': 'recommonmark.parser.CommonMarkParser',
+}
+source_suffix = ['.rst', '.md']
+
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -70,3 +80,11 @@ html_static_path = ['_static']
 # -- Autodoc options --------------------------------------------------------
 autodoc_member_order = 'bysource'
 autoclass_content = 'init'
+
+
+def setup(app):
+    app.add_config_value('recommonmark_config', {
+            'url_resolver': lambda url: github_doc_root + url,
+            'auto_toc_tree_section': 'Contents',
+            }, True)
+    app.add_transform(AutoStructify)

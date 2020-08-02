@@ -165,7 +165,7 @@ class JSONConfigSource(_ConfigSource):
             raise TypeError(
                 "JSONConfigSource `source` must be a string or path-like object"
             )
-        with open(self.source, 'rt') as json_file:
+        with open(self.source, "rt") as json_file:
             config = json.load(json_file)
         return config
 
@@ -217,7 +217,7 @@ class ValidationSchema:
     def load(self) -> Dict:
         """Load validation schema."""
         if isinstance(self.source, (str, os.PathLike)):
-            with open(self.source, 'rt') as json_file:
+            with open(self.source, "rt") as json_file:
                 schema = json.load(json_file)
         elif isinstance(self.source, Dict):
             schema = self.source

@@ -8,7 +8,7 @@ module = "cascade_config"
 author = "RalfG"
 author-email = "ralf@gabriels.dev"
 home-page = "https://github.com/RalfG/cascade-config"
-description-file = "README.md"
+description-file = "README.rst"
 classifiers = [
     "License :: OSI Approved :: Apache Software License",
     "Intended Audience :: Developers",
