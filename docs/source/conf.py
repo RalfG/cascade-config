@@ -12,6 +12,7 @@
 # documentation root, use os.path.abspath to make it absolute, like shown here.
 #
 import os
+from run import cascade_conf
 import sys
 sys.path.insert(0, os.path.abspath('../../'))
 
@@ -23,9 +24,14 @@ copyright = '2020, RalfG'
 author = 'RalfG'
 github_project_url = "https://github.com/ralfg/cascade-config/"
 
+def get_version(path):
+    with open(path, "rt") as f:
+        for line in f:
+            if line.startswith("__version__ = "):
+                return line.strip().split(" = ")[1].strip("\"'")
+
 # The full version, including alpha/beta/rc tags
-import pkg_resources
-release = pkg_resources.get_distribution("cascade_config").version
+release = get_version("../../cascade_config.py")
 
 # -- General configuration ---------------------------------------------------
 
