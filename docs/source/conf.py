@@ -24,8 +24,8 @@ author = 'RalfG'
 github_project_url = "https://github.com/ralfg/cascade-config/"
 
 # The full version, including alpha/beta/rc tags
-from cascade_config import __version__ as cascade_config_version
-release = cascade_config_version
+import pkg_resources
+release = pkg_resources.get_distribution("cascade_config").version
 
 # -- General configuration ---------------------------------------------------
 
