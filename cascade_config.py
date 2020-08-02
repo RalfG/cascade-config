@@ -21,20 +21,7 @@ class CascadeConfig:
         Parameters
         ----------
         validation_schema: str, path-like, dict, or cascade_config.ValidationSchema, optional
-            JSON schema to validate fully cascaded configuration
-
-        Methods
-        -------
-        add_dict(*args, **kwargs)
-            add dictionary configuration source to source list
-        add_argumentparser(*args, **kwargs)
-            add argumentparser configuration source to source list
-        add_namespace(*args, **kwargs)
-            add argparse Namespace configuration source to source list
-        add_json(*args, **kwargs)
-            add JSON configuration source to source list
-        parse()
-            parse all configuration sources and return cascaded configuration
+            JSON Schema to validate fully cascaded configuration
 
         Examples
         --------
@@ -49,7 +36,7 @@ class CascadeConfig:
 
     @property
     def validation_schema(self):
-        """Get validation_schema."""
+        """JSON Schema to validate fully cascaded configuration."""
         return self._validation_schema
 
     @validation_schema.setter
@@ -114,7 +101,7 @@ class _ConfigSource(ABC):
             source for the configuration, either a dictionary, path to a file, or
             argument parser.
         validation_schema: str, path-like, dict, or cascade_config.ValidationSchema, optional
-            validation schema to validate single configuration
+            JSON Schema to validate single configuration
         subkey : str
             adds the configuration to a subkey of the final cascased configuration;
             e.g. specifying a subkey `"user"` for a configuration source, would add it
