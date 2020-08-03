@@ -2,7 +2,8 @@
 
 ![](https://flat.badgen.net/pypi/v/cascade-config?icon=pypi)
 ![](https://flat.badgen.net/github/release/ralfg/cascade-config)
-![](https://flat.badgen.net/github/checks/ralfg/cascade-config)
+![](https://flat.badgen.net/github/checks/ralfg/cascade-config/)
+![](https://flat.badgen.net/codecov/c/github/ralfg/cascade-config)
 ![](https://flat.badgen.net/github/last-commit/ralfg/cascade-config)
 ![](https://flat.badgen.net/github/license/ralfg/cascade-config)
 
