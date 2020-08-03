@@ -28,6 +28,7 @@ jobs:
         DRAFT_RELEASE: "false"
         PRE_RELEASE: "false"
         CHANGELOG_FILE: "CHANGELOG.md"
+        ALLOW_TAG_PREFIX: "true"
 
     - name: Build and publish to PyPI
       env:
