@@ -42,7 +42,8 @@ with these changes. You pull request message ideally should include:
     2. Update the documentation (`README.md` and `docs/source/usage.rst`) if required.
     3. Update the changelog (if not already done) in `CHANGELOG.md` according to
     [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
-    4. Set a new tag with the version number, e.g. `git tag v0.1.5`.
+    4. Commit all final changes to the `master` branch.
+    4. On `master`, set a new tag with the version number, e.g. `git tag v0.1.5`.
     5. Push to GitHub, with the tag: `git push; git push --tags`.
 
 - When a new tag is pushed to (or made on) GitHub that matches `v*`, the
