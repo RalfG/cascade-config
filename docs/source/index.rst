@@ -6,5 +6,5 @@
 
    usage
    api
-   changelog_link
-   contributing_link
+   changelog
+   contributing
