@@ -202,7 +202,7 @@ class NamespaceConfigSource(_ConfigSource):
     def _read(self) -> Dict:
         if not isinstance(self.source, Namespace):
             raise TypeError(
-                "ArgumentParserSource `source` must be an argparse.Namespace object"
+                "NamespaceConfigSource `source` must be an argparse.Namespace object"
             )
         config = vars(self.source)
         return config

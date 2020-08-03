@@ -4,11 +4,13 @@ import argparse
 import json
 from os import stat
 import tempfile
+from typing import Type
 
 import pytest
 import jsonschema
 
 import cascade_config
+from cascade_config import ValidationSchema
 
 TEST_SCHEMA = {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -109,6 +111,27 @@ class TestCascadeConfig:
         )
         assert cc.parse() == TEST_SAMPLE
 
+    def test_single_config_dict_typeerror(self):
+        """Test Namespace config type error."""
+        cc = cascade_config.CascadeConfig()
+        cc.add_dict(42)
+        with pytest.raises(TypeError):
+            cc.parse()
+
+    def test_single_config_json_typeerror(self):
+        """Test Namespace config type error."""
+        cc = cascade_config.CascadeConfig()
+        cc.add_json(42)
+        with pytest.raises(TypeError):
+            cc.parse()
+
+    def test_single_config_namespace_typeerror(self):
+        """Test Namespace config type error."""
+        cc = cascade_config.CascadeConfig()
+        cc.add_namespace("not_a_namespace")
+        with pytest.raises(TypeError):
+            cc.parse()
+
     def test_multiple_configs(self):
         """Test multiple config sources."""
         subkey = "config_example"
@@ -119,3 +142,11 @@ class TestCascadeConfig:
         )
         cc.add_json(self.get_json_file(TEST_SAMPLE_2))
         assert cc.parse() == TEST_SAMPLE_CASC
+
+    def test_validation_schema_from_object(self):
+        with pytest.raises(TypeError):
+            cascade_config.ValidationSchema.from_object(42)
+
+    def test_validation_schema_from_json(self):
+        vs = cascade_config.ValidationSchema(self.get_json_file(TEST_SCHEMA))
+        assert vs.load() == TEST_SCHEMA
