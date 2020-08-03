@@ -136,7 +136,7 @@ class _ConfigSource(ABC):
         """Read source into dict."""
         pass
 
-    def load(self):
+    def load(self) -> Dict:
         """Read, validate, and place in subkey if required."""
         if self.subkey:
             config = dict()

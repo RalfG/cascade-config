@@ -1,9 +1,10 @@
-.. include:: ../../README.md
+.. mdinclude:: ../../README.md
 
 .. toctree::
-   :maxdepth: 2
+   :maxdepth: 3
    :hidden:
 
    usage
    api
-   changelog
+   changelog_link
+   contributing_link
