@@ -1,4 +1,4 @@
-Python module API
+API
 -----------------
 
 .. automodule:: cascade_config
