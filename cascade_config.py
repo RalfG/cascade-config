@@ -1,6 +1,6 @@
 """Cascading configuration from the CLI and config files."""
 
-__version__ = "0.1.0-a0"
+__version__ = "0.2.0"
 
 import json
 import os
@@ -14,7 +14,7 @@ import jsonschema
 class CascadeConfig:
     """Cascading configuration."""
 
-    def __init__(self, validation_schema=None):
+    def __init__(self, validation_schema=None, none_overrides_value=False):
         """
         Cascading configuration.
 
@@ -22,6 +22,9 @@ class CascadeConfig:
         ----------
         validation_schema: str, path-like, dict, or cascade_config.ValidationSchema, optional
             JSON Schema to validate fully cascaded configuration
+        none_overrides_value: bool
+            If True, a None value overrides a not-None value from the previous configuration.
+            If False, None values will never override not-None values.
 
         Examples
         --------
@@ -32,6 +35,7 @@ class CascadeConfig:
 
         """
         self.validation_schema = validation_schema
+        self.none_overrides_value = none_overrides_value
         self.sources = []
 
     @property
@@ -52,7 +56,9 @@ class CascadeConfig:
         for k, v in updater.items():
             if isinstance(v, dict):
                 original[k] = self._update_dict_recursively(original.get(k, {}), v)
-            else:
+            elif v or k not in original:  # v is not None, or key does not exist yet
+                original[k] = v
+            elif self.none_overrides_value:  # v is None, but can override previous value
                 original[k] = v
         return original
 
