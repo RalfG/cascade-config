@@ -1,12 +1,13 @@
 """Cascading configuration from the CLI and config files."""
 
-__version__ = "0.1.0-a0"
+__version__ = "0.1.0-a1"
 
+import io
 import json
 import os
 from abc import ABC, abstractmethod
 from argparse import ArgumentParser, Namespace
-from typing import Dict
+from typing import Union, Dict, TextIO
 
 import jsonschema
 
@@ -59,6 +60,7 @@ class CascadeConfig:
     def add_dict(self, *args, **kwargs):
         """
         Add dictionary configuration source to source list.
+
         *args and **kwargs are passed to :class:`cascade_config.DictConfigSource()`.
 
         """
@@ -68,6 +70,7 @@ class CascadeConfig:
     def add_argumentparser(self, *args, **kwargs):
         """
         Add argumentparser configuration source to source list.
+
         *args and **kwargs are passed to :class:`cascade_config.ArgumentParserConfigSource()`.
 
         """
@@ -77,6 +80,7 @@ class CascadeConfig:
     def add_namespace(self, *args, **kwargs):
         """
         Add argparse Namespace configuration source to source list.
+
         *args and **kwargs are passed to :class:`cascade_config.NamespaceConfigSource()`.
         """
         source = NamespaceConfigSource(*args, **kwargs)
@@ -85,6 +89,7 @@ class CascadeConfig:
     def add_json(self, *args, **kwargs):
         """
         Add JSON configuration source to source list.
+
         *args and **kwargs are passed to :class:`cascade_config.JSONConfigSource()`.
         """
         source = JSONConfigSource(*args, **kwargs)
@@ -175,13 +180,11 @@ class JSONConfigSource(_ConfigSource):
     """JSON configuration source."""
 
     def _read(self) -> Dict:
-        if not isinstance(self.source, (str, os.PathLike)):
+        if not isinstance(self.source, (str, os.PathLike, io.TextIOBase)):
             raise TypeError(
-                "JSONConfigSource `source` must be a string or path-like object"
+                "JSONConfigSource `source` must be a string, os.PathLike, or TextIO object"
             )
-        with open(self.source, "rt") as json_file:
-            config = json.load(json_file)
-        return config
+        return json_opener(self.source)
 
 
 class ArgumentParserConfigSource(_ConfigSource):
@@ -217,26 +220,36 @@ class ValidationSchema:
 
     @classmethod
     def from_object(cls, obj):
-        """Return ValidationSchema from str, path-like, dict, or ValidationSchema."""
-        if isinstance(obj, (str, os.PathLike, Dict)):
+        """Return ValidationSchema from str, os.PathLike, TextIO, dict, or ValidationSchema."""
+        if isinstance(obj, (str, os.PathLike, dict, io.TextIOBase)):
             return cls(obj)
         elif isinstance(obj, cls):
             return obj
         else:
             raise TypeError(
                 f"Cannot create ValidationSchema from type {type(obj)}. Must be a "
-                "string, path-like, dict, or cascade_config.ValidationSchema object"
+                "str, os.PathLike, TextIO, dict, or cascade_config.ValidationSchema "
+                "object"
             )
 
     def load(self) -> Dict:
         """Load validation schema."""
-        if isinstance(self.source, (str, os.PathLike)):
-            with open(self.source, "rt") as json_file:
-                schema = json.load(json_file)
-        elif isinstance(self.source, Dict):
-            schema = self.source
-        else:
-            raise TypeError(
-                "ValidationSchema `source` must be of type string, path-like, or dict"
-            )
-        return schema
+        return json_opener(self.source)
+
+
+def json_opener(value: Union[str, os.PathLike, TextIO, Dict]):
+    """Open JSON file from str, os.PathLike, TextIO, or dict."""
+    if isinstance(value, (str, os.PathLike)):
+        with open(value, "rt") as json_file:
+            contents = json.load(json_file)
+    elif isinstance(value, io.TextIOBase):
+        value.seek(0)
+        contents = json.load(value)
+    elif isinstance(value, dict):
+        contents = value
+    else:
+        raise TypeError(
+            f"Cannot read JSON from type {type(value)}. Must be a string, os.PathLike, "
+            "TextIO, or dict."
+        )
+    return contents
