@@ -1,6 +1,6 @@
 """Cascading configuration from the CLI and config files."""
 
-__version__ = "0.1.0-a0"
+__version__ = "0.2.0"
 
 import json
 import os
