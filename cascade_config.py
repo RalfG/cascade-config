@@ -55,7 +55,12 @@ class CascadeConfig:
         """Update dictionary recursively."""
         for k, v in updater.items():
             if isinstance(v, dict):
-                original[k] = self._update_dict_recursively(original.get(k, {}), v)
+                if not v: # v is not None, v is empty dictionary
+                    original[k] = dict()
+                else:
+                    original[k] = self._update_dict_recursively(original.get(k, {}), v)
+            elif isintance(v, bool):
+                original[k] = v  # v is True or False
             elif v or k not in original:  # v is not None, or key does not exist yet
                 original[k] = v
             elif self.none_overrides_value:  # v is None, but can override previous value
