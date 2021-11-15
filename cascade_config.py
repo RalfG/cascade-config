@@ -59,7 +59,7 @@ class CascadeConfig:
                     original[k] = dict()
                 else:
                     original[k] = self._update_dict_recursively(original.get(k, {}), v)
-            elif isintance(v, bool):
+            elif isinstance(v, bool):
                 original[k] = v  # v is True or False
             elif v or k not in original:  # v is not None, or key does not exist yet
                 original[k] = v
