@@ -32,7 +32,7 @@ jobs:
       run: |
         pytest --cov=cascade_config tests
     - name: Uploade coverage reports to Codecov
-      uses: codecov/codecov-action@v1.0.12
+      uses: codecov/codecov-action@v3
 
   test_platforms:
     runs-on: ${{ matrix.os }}
