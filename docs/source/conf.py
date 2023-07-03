@@ -13,18 +13,15 @@
 #
 import os
 import sys
-from m2r import MdInclude
-from recommonmark.transform import AutoStructify
 
-sys.path.insert(0, os.path.abspath('../../'))
+sys.path.insert(0, os.path.abspath("../../"))
 
 # -- Project information -----------------------------------------------------
 
-project = 'cascade-config'
-copyright = '2020, RalfG'
-author = 'RalfG'
+project = "cascade-config"
+author = "RalfG"
 github_project_url = "https://github.com/ralfg/cascade-config/"
-github_doc_root = 'https://github.com/ralfg/cascade-config/tree/master/docs/'
+github_doc_root = "https://github.com/ralfg/cascade-config/tree/main/docs/"
 
 
 def get_version(path):
@@ -32,6 +29,7 @@ def get_version(path):
         for line in f:
             if line.startswith("__version__ = "):
                 return line.strip().split(" = ")[1].strip("\"'")
+
 
 # The full version, including alpha/beta/rc tags
 release = get_version("../../cascade_config.py")
@@ -46,18 +44,18 @@ extensions = [
     "sphinx.ext.autosummary",
     "sphinx.ext.napoleon",
     "sphinx_rtd_theme",
-    "recommonmark",
+    "sphinx_mdinclude",
 ]
-source_suffix = ['.rst', '.md']
-master_doc = 'index'
+source_suffix = [".rst", ".md"]
+master_doc = "index"
 
 # Add any paths that contain templates here, relative to this directory.
-templates_path = ['_templates']
+templates_path = ["_templates"]
 
 # List of patterns, relative to source directory, that match files and
 # directories to ignore when looking for source files.
 # This pattern also affects html_static_path and html_extra_path.
-exclude_patterns = ['_build']
+exclude_patterns = ["_build"]
 
 
 # -- Options for HTML output -------------------------------------------------
@@ -65,33 +63,26 @@ exclude_patterns = ['_build']
 # The theme to use for HTML and HTML Help pages.  See the documentation for
 # a list of builtin themes.
 #
-html_theme = 'sphinx_rtd_theme'
+html_theme = "sphinx_rtd_theme"
 
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
 # so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# html_static_path = ["_static"]
 
 
 # -- Autodoc options --------------------------------------------------------
-autodoc_member_order = 'bysource'
-autoclass_content = 'init'
+autodoc_default_options = {"members": True, "show-inheritance": True}
+autodoc_member_order = "bysource"
+autodoc_typehints = "description"
+autoclass_content = "init"
 
 
 # https://github.com/rtfd/recommonmark/blob/master/docs/conf.py
 def setup(app):
     config = {
         # 'url_resolver': lambda url: github_doc_root + url,
-        'auto_toc_tree_section': 'Contents',
-        'enable_eval_rst': True,
+        "auto_toc_tree_section": "Contents",
+        "enable_eval_rst": True,
     }
-    app.add_config_value('recommonmark_config', config, True)
-    app.add_transform(AutoStructify)
-
-    # from m2r to make `mdinclude` work
-    app.add_config_value('no_underscore_emphasis', False, 'env')
-    app.add_config_value('m2r_parse_relative_links', False, 'env')
-    app.add_config_value('m2r_anonymous_references', False, 'env')
-    app.add_config_value('m2r_disable_inline_math', False, 'env')
-    app.add_directive('mdinclude', MdInclude)
