@@ -2,15 +2,12 @@
 
 import argparse
 import json
-from os import stat
 import tempfile
-from typing import Type
 
-import pytest
 import jsonschema
+import pytest
 
 import cascade_config
-from cascade_config import ValidationSchema
 
 TEST_SCHEMA = {
     "$schema": "http://json-schema.org/draft-07/schema#",
@@ -26,29 +23,29 @@ TEST_SCHEMA = {
                 },
                 "log_level": {
                     "type": "string",
-                    "enum": ["debug", "info", "warning", "error", "critical"]
-                }
-            }
+                    "enum": ["debug", "info", "warning", "error", "critical"],
+                },
+            },
         }
-    }
+    },
 }
 
-TEST_SAMPLE = {
-    "config_example": {"num_cpu": 1, "log_level": "info"}
+TEST_SAMPLE = {"config_example": {"num_cpu": 1, "log_level": "info"}}
+TEST_SAMPLE_2 = {"config_example": {"log_level": "debug"}, "test": True}
+TEST_SAMPLE_CASC = {"config_example": {"num_cpu": 1, "log_level": "debug"}, "test": True}
+TEST_SAMPLE_INVALID = {"config_example": {"num_cpu": "not_a_number", "log_level": "info"}}
+TEST_SAMPLE_NESTED_A = {"config_example": {"num_cpu": 1, "depth_2": {"depth_3a": True}}}
+TEST_SAMPLE_NESTED_B = {"config_example": {"num_cpu": 1, "depth_2": {"depth_3b": False}}}
+TEST_SAMPLE_NESTED_RESULT_NOMAX = {
+    "config_example": {"num_cpu": 1, "depth_2": {"depth_3a": True, "depth_3b": False}}
 }
-TEST_SAMPLE_2 = {
-    "config_example": {"log_level": "debug"}, "test": True
-}
-TEST_SAMPLE_CASC = {
-    "config_example": {"num_cpu": 1, "log_level": "debug"}, "test": True
-}
+TEST_SAMPLE_NESTED_RESULT_MAX1 = {"config_example": {"num_cpu": 1, "depth_2": {"depth_3b": False}}}
 
-TEST_SAMPLE_INVALID = {
-    "config_example": {"num_cpu": "not_a_number", "log_level": "info"}
-}
 
 def get_sample_namespace(test_sample):
-    flatten = lambda l: [item for sublist in l for item in sublist]
+    def flatten(lst):
+        return [item for sublist in lst for item in sublist]
+
     test_args = flatten([[f"--{i[0]}", f"{i[1]}"] for i in test_sample.items()])
     parser = argparse.ArgumentParser()
     parser.add_argument("--num_cpu", type=int)
@@ -61,7 +58,7 @@ class TestCascadeConfig:
 
     @staticmethod
     def get_json_file(test_sample):
-        with tempfile.NamedTemporaryFile(mode='wt', delete=False) as json_file:
+        with tempfile.NamedTemporaryFile(mode="wt", delete=False) as json_file:
             json.dump(test_sample, json_file)
             json_file.seek(0)
             json_file_name = json_file.name
@@ -69,7 +66,9 @@ class TestCascadeConfig:
 
     @staticmethod
     def get_sample_namespace(test_sample):
-        flatten = lambda l: [item for sublist in l for item in sublist]
+        def flatten(lst):
+            return [item for sublist in lst for item in sublist]
+
         test_args = flatten([[f"--{i[0]}", f"{i[1]}"] for i in test_sample.items()])
         parser = argparse.ArgumentParser()
         parser.add_argument("--num_cpu", type=int)
@@ -105,9 +104,7 @@ class TestCascadeConfig:
         subkey = "config_example"
         cc = cascade_config.CascadeConfig()
         cc.add_namespace(
-            get_sample_namespace(TEST_SAMPLE[subkey]),
-            subkey=subkey,
-            validation_schema=TEST_SCHEMA
+            get_sample_namespace(TEST_SAMPLE[subkey]), subkey=subkey, validation_schema=TEST_SCHEMA
         )
         assert cc.parse() == TEST_SAMPLE
 
@@ -142,6 +139,18 @@ class TestCascadeConfig:
         )
         cc.add_json(self.get_json_file(TEST_SAMPLE_2))
         assert cc.parse() == TEST_SAMPLE_CASC
+
+    def test_max_recursion(self):
+        """Test max_recursion_depth argument."""
+        cc = cascade_config.CascadeConfig(max_recursion_depth=None)
+        cc.add_dict(TEST_SAMPLE_NESTED_A)
+        cc.add_dict(TEST_SAMPLE_NESTED_B)
+        assert cc.parse() == TEST_SAMPLE_NESTED_RESULT_NOMAX
+
+        cc = cascade_config.CascadeConfig(max_recursion_depth=1)
+        cc.add_dict(TEST_SAMPLE_NESTED_A)
+        cc.add_dict(TEST_SAMPLE_NESTED_B)
+        assert cc.parse() == TEST_SAMPLE_NESTED_RESULT_MAX1
 
     def test_validation_schema_from_object(self):
         with pytest.raises(TypeError):
