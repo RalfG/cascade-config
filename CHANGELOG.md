@@ -6,6 +6,15 @@ The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to
 [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [0.4.0] - 03/07/2023
+
+### Added
+
+- Added `max_recursion_depth` argument to `CascadeConfig` to limit the depth of
+  hierarchically updating nested dictionaries. When the maximum nesting depth is
+  exceeded, the new dictionary will be used as-is, overwriting any previous
+  values under that dictionary tree.
+
 ## [0.3.1] - 03/07/2023
 
 ### Fixed

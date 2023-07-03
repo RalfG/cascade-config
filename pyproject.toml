@@ -49,3 +49,12 @@ docs = [
 
 [tool.flit.module]
 name = "cascade_config"
+
+[tool.black]
+line-length = 99
+target-version = ['py38']
+
+[tool.ruff]
+line-length = 99
+target-version = 'py38'
+
