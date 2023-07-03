@@ -4,7 +4,7 @@
    :maxdepth: 3
    :hidden:
 
-   usage
+   Home <self>
    api
    changelog
    contributing
