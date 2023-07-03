@@ -70,7 +70,8 @@ class CascadeConfig:
     def add_dict(self, *args, **kwargs):
         """
         Add dictionary configuration source to source list.
-        *args and **kwargs are passed to :class:`cascade_config.DictConfigSource()`.
+
+        ``*args`` and ``**kwargs`` are passed to :class:`cascade_config.DictConfigSource()`.
 
         """
         source = DictConfigSource(*args, **kwargs)
@@ -79,7 +80,9 @@ class CascadeConfig:
     def add_argumentparser(self, *args, **kwargs):
         """
         Add argumentparser configuration source to source list.
-        *args and **kwargs are passed to :class:`cascade_config.ArgumentParserConfigSource()`.
+
+        ``*args`` and ``**kwargs`` are passed to
+        :class:`cascade_config.ArgumentParserConfigSource()`.
 
         """
         source = ArgumentParserConfigSource(*args, **kwargs)
@@ -88,7 +91,9 @@ class CascadeConfig:
     def add_namespace(self, *args, **kwargs):
         """
         Add argparse Namespace configuration source to source list.
-        *args and **kwargs are passed to :class:`cascade_config.NamespaceConfigSource()`.
+
+        ``*args`` and ``**kwargs`` are passed to
+        :class:`cascade_config.NamespaceConfigSource()`.
         """
         source = NamespaceConfigSource(*args, **kwargs)
         self.sources.append(source)
@@ -96,7 +101,9 @@ class CascadeConfig:
     def add_json(self, *args, **kwargs):
         """
         Add JSON configuration source to source list.
-        *args and **kwargs are passed to :class:`cascade_config.JSONConfigSource()`.
+
+        ``*args`` and ``**kwargs`` are passed to
+        :class:`cascade_config.JSONConfigSource()`.
         """
         source = JSONConfigSource(*args, **kwargs)
         self.sources.append(source)
