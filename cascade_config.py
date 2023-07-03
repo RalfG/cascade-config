@@ -1,6 +1,6 @@
 """Cascading configuration from the CLI and config files."""
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 import json
 import os
@@ -14,7 +14,12 @@ import jsonschema
 class CascadeConfig:
     """Cascading configuration."""
 
-    def __init__(self, validation_schema=None, none_overrides_value=False):
+    def __init__(
+        self,
+        validation_schema=None,
+        none_overrides_value=False,
+        max_recursion_depth=None,
+    ):
         """
         Cascading configuration.
 
@@ -25,6 +30,10 @@ class CascadeConfig:
         none_overrides_value: bool
             If True, a None value overrides a not-None value from the previous configuration.
             If False, None values will never override not-None values.
+        max_recursion_depth: int, optional
+            Maximum depth of nested dictionaries to recurse into. When the maximum recursion depth
+            is reached, the nested dictionary will be replaced by the newer nested dictionary. If
+            None, recurse into all nested dictionaries.
 
         Examples
         --------
@@ -36,6 +45,7 @@ class CascadeConfig:
         """
         self.validation_schema = validation_schema
         self.none_overrides_value = none_overrides_value
+        self.max_recursion_depth = max_recursion_depth
         self.sources = []
 
     @property
@@ -51,21 +61,28 @@ class CascadeConfig:
         else:
             self._validation_schema = None
 
-    def _update_dict_recursively(self, original: Dict, updater: Dict) -> Dict:
+    def _update_dict_recursively(self, original: Dict, updater: Dict, depth: int) -> Dict:
         """Update dictionary recursively."""
+        depth = depth + 1
         for k, v in updater.items():
             if isinstance(v, dict):
-                if not v:  # v is not None, v is empty dictionary
+                if not v:
+                    # v is an empty dictionary
                     original[k] = dict()
+                elif self.max_recursion_depth and depth > self.max_recursion_depth:
+                    # v is a populated dictionary, exceeds max depth
+                    original[k] = v
                 else:
-                    original[k] = self._update_dict_recursively(original.get(k, {}), v)
+                    # v is a populated dictionary, can be further recursed
+                    original[k] = self._update_dict_recursively(original.get(k, {}), v, depth)
             elif isinstance(v, bool):
-                original[k] = v  # v is True or False
-            elif v or k not in original:  # v is not None, or key does not exist yet
+                # v is True or False
                 original[k] = v
-            elif (
-                self.none_overrides_value
-            ):  # v is None, but can override previous value
+            elif v or k not in original:
+                # v is thruthy (therefore not None), or key does not exist yet
+                original[k] = v
+            elif self.none_overrides_value:
+                # v is None, but can override previous value
                 original[k] = v
         return original
 
@@ -114,7 +131,7 @@ class CascadeConfig:
         """Parse all sources, cascade, validate, and return cascaded configuration."""
         config = dict()
         for source in self.sources:
-            config = self._update_dict_recursively(config, source.load())
+            config = self._update_dict_recursively(config, source.load(), depth=0)
 
         if self.validation_schema:
             jsonschema.validate(config, self.validation_schema.load())
@@ -196,9 +213,7 @@ class JSONConfigSource(_ConfigSource):
 
     def _read(self) -> Dict:
         if not isinstance(self.source, (str, os.PathLike)):
-            raise TypeError(
-                "JSONConfigSource `source` must be a string or path-like object"
-            )
+            raise TypeError("JSONConfigSource `source` must be a string or path-like object")
         with open(self.source, "rt") as json_file:
             config = json.load(json_file)
         return config
@@ -221,9 +236,7 @@ class NamespaceConfigSource(_ConfigSource):
 
     def _read(self) -> Dict:
         if not isinstance(self.source, Namespace):
-            raise TypeError(
-                "NamespaceConfigSource `source` must be an argparse.Namespace object"
-            )
+            raise TypeError("NamespaceConfigSource `source` must be an argparse.Namespace object")
         config = vars(self.source)
         return config
 
@@ -256,7 +269,5 @@ class ValidationSchema:
         elif isinstance(self.source, Dict):
             schema = self.source
         else:
-            raise TypeError(
-                "ValidationSchema `source` must be of type string, path-like, or dict"
-            )
+            raise TypeError("ValidationSchema `source` must be of type string, path-like, or dict")
         return schema
